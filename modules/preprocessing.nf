@@ -44,15 +44,29 @@ process MINIMAP2 {
     tuple val(meta), path("*.bam")
 
     script:
-    """
-    minimap2 \\
-        -ax sr \\
-        -t $task.cpus \\
-        $reference \\
-        $reads \\
-        | samtools view \\
-            -bS \\
-            | samtools sort \\
-                -o ${meta.id}.bam
-    """
+    if (reads.size() == 3) { // read.fastq, read1.fastq, read2.fastq
+        """
+        minimap2 \\
+            -ax sr \\
+            -t $task.cpus \\
+            $reference \\
+            ${reads[1]} ${reads[2]} \\
+            | samtools view \\
+                -bS \\
+                | samtools sort \\
+                    -o ${meta.id}.bam
+        """
+    } else { // either read.fastq or read1.fastq, read2.fastq
+        """
+        minimap2 \\
+            -ax sr \\
+            -t $task.cpus \\
+            $reference \\
+            $reads \\
+            | samtools view \\
+                -bS \\
+                | samtools sort \\
+                    -o ${meta.id}.bam
+        """
+    }
 }
