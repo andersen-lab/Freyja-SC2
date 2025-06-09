@@ -20,7 +20,7 @@ defaults:
     shell: bash -eli {0}
 jobs:
   rerun_demix:
-    runs-on: self-hosted
+    runs-on: [self-hosted, profchaos]
     permissions:
         contents: write
         id-token: write

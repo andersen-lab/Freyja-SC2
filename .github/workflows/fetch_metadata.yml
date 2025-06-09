@@ -22,7 +22,7 @@ defaults:
 
 jobs:
   fetch_ncbi_metadata:
-    runs-on: self-hosted
+    runs-on: [self-hosted, profchaos]
     steps: 
       - name: Checkout main
         uses: actions/checkout@v4

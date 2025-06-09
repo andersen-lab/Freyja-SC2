@@ -23,7 +23,7 @@ defaults:
 
 jobs:
   run:
-    runs-on: self-hosted
+    runs-on: [self-hosted, profchaos]
     permissions:
       contents: write
       id-token: write
