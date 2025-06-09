@@ -13,6 +13,8 @@ env:
   NXF_WORK: ${{ github.workspace }}/work
   NXF_OUTPUT: ${{ github.workspace }}/outputs
   NXF_NAME: github-${{ github.run_number }}
+  TOWER_ACCESS_TOKEN: ${{ secrets.TOWER_ACCESS_TOKEN }}
+  TOWER_WORKSPACE_ID: ${{ secrets.TOWER_WORKSPACE_ID }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   BATCH_SIZE: 50
 
@@ -69,7 +71,8 @@ jobs:
                 nextflow run main.nf \
                   --num_samples $BATCH_SIZE \
                   -profile local \
-                  -entry fetch
+                  -entry fetch \
+                  -with-tower
           
       - name: Aggregate outputs
         run: |
