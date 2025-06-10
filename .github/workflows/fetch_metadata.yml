@@ -59,7 +59,7 @@ jobs:
         run: |
               git config --local user.name "$GITHUB_ACTOR"
               git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
-              git remote set-url origin https://github.com/andersen-lab/freyja-sc2
+              git remote set-url origin https://github.com/andersen-lab/Freyja-SC2.git
               if [[($(git status data/usher_barcodes.feather --porcelain | wc -c) -ne 0)]]; then
                 git add data/usher_barcodes.feather
                 git add data/lineages.yml
