@@ -16,7 +16,7 @@ env:
   TOWER_ACCESS_TOKEN: ${{ secrets.TOWER_ACCESS_TOKEN }}
   TOWER_WORKSPACE_ID: ${{ secrets.TOWER_WORKSPACE_ID }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  BATCH_SIZE: 50
+  BATCH_SIZE: 200
 
 
 defaults:
@@ -122,6 +122,12 @@ jobs:
               git add data/all_metadata.csv
               git commit -m "Update processed samples"
               git push --force
+
+      - name: 'Create GitHub Run Summary'
+        run: |
+          echo "# Job Summary $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "## Job Information" >> $GITHUB_STEP_SUMMARY
+          cat data/all_metadata.csv | rev | cut -f 2 -d , | rev | sort | uniq -c >> $GITHUB_STEP_SUMMARY
 
       - name: 'Clean workspace'
         run: |
