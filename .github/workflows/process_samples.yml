@@ -121,7 +121,7 @@ jobs:
               git remote set-url origin https://github.com/andersen-lab/freyja-sc2
               git add data/all_metadata.csv
               git commit -m "Update processed samples"
-              git push --force
+              git push
 
       - name: 'Create GitHub Run Summary'
         run: |

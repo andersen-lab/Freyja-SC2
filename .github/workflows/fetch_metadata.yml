@@ -67,4 +67,4 @@ jobs:
               fi
               git add data/all_metadata.csv
               git commit -m "Update metadata"
-              git push --force
+              git push
