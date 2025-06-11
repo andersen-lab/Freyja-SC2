@@ -117,8 +117,8 @@ jobs:
       
       - name: 'Commit and push changes'
         run: |
-              git config --local user.name "$GITHUB_ACTOR"
-              git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
+              git config --global user.email "github-actions[bot]@users.noreply.github.com"
+              git config --global user.name "github-actions[bot]"
               git remote set-url origin https://github.com/andersen-lab/freyja-sc2
               git add data/all_metadata.csv
               git commit -m "Update processed samples"
