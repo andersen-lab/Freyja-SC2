@@ -28,6 +28,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          ref: main
       - name: Cache envs
         id: cache-envs
         uses: actions/cache@v4
