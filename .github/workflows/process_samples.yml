@@ -16,7 +16,7 @@ env:
   TOWER_ACCESS_TOKEN: ${{ secrets.TOWER_ACCESS_TOKEN }}
   TOWER_WORKSPACE_ID: ${{ secrets.TOWER_WORKSPACE_ID }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  BATCH_SIZE: 125
+  BATCH_SIZE: 200
 
 
 defaults:
