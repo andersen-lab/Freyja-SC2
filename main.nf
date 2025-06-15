@@ -1,29 +1,29 @@
 #!/usr/bin/env nextflow
-nextflow.enable.dsl=2
+nextflow.enable.dsl = 2
 
 /*
  * Automated pipeline for Freyja analysis of SARS-CoV-2 wastewater sequencing data
  */
 
-include { SRATOOLS_FASTERQDUMP    } from './modules/nf-core/sratools/fasterqdump/main'
-include { SRATOOLS_PREFETCH       } from './modules/nf-core/sratools/prefetch/main'
+include { SRATOOLS_FASTERQDUMP } from './modules/nf-core/sratools/fasterqdump/main'
+include { SRATOOLS_PREFETCH } from './modules/nf-core/sratools/prefetch/main'
 
 include {
-    CUTADAPT_TRIM;
-    MINIMAP2;
-    IVAR_TRIM;
+    CUTADAPT_TRIM ;
+    MINIMAP2 ;
+    IVAR_TRIM
 } from "./modules/preprocessing.nf"
 
 include {
-    FREYJA_VARIANTS;
-    FREYJA_DEMIX;
+    FREYJA_VARIANTS ;
+    FREYJA_DEMIX
 } from "./modules/freyja.nf"
 
 workflow fetch {
     Channel.fromPath(params.sra_metadata)
         .splitCsv(header: true, sep: ',')
         .map { row ->
-            meta = [
+            def meta = [
                 id: row.accession.toString(),
                 sample_status: row.sample_status.toString(),
                 primer_scheme: row.amplicon_PCR_primer_scheme.toString(),
@@ -37,8 +37,8 @@ workflow fetch {
 
     samples_ch
         .map { meta, accession -> accession }
-        .collectFile(name: "accession_list.txt", storeDir: "./data") { accession -> 
-            accession + "\n" 
+        .collectFile(name: "accession_list.txt", storeDir: "./data") { accession ->
+            accession + "\n"
         }
 
     SRATOOLS_PREFETCH(samples_ch)
@@ -46,7 +46,8 @@ workflow fetch {
 
     SRATOOLS_FASTERQDUMP.out.reads
         .filter { it[0].sample_status == 'to_run' }
-        .branch { 
+        .filter { it[1].size() != 3 }
+        .branch {
             unknown_primer: it[0].primer_scheme == 'unknown'
             known_primer: it[0].primer_scheme != 'unknown'
         }
@@ -54,11 +55,11 @@ workflow fetch {
 
     process_unknown_primer(fq_ch.unknown_primer)
     process_known_primer(fq_ch.known_primer)
-
 }
 
 workflow process_unknown_primer {
-    take: unknown_primer_fastq_ch
+    take:
+    unknown_primer_fastq_ch
 
     main:
     CUTADAPT_TRIM(unknown_primer_fastq_ch)
@@ -68,7 +69,8 @@ workflow process_unknown_primer {
 }
 
 workflow process_known_primer {
-    take: known_primer_fastq_ch
+    take:
+    known_primer_fastq_ch
 
     main:
     MINIMAP2(known_primer_fastq_ch, params.reference)
@@ -80,15 +82,14 @@ workflow process_known_primer {
 workflow freyja {
     take:
     bam_ch
-    
+
     main:
     FREYJA_VARIANTS(bam_ch, params.reference)
     FREYJA_DEMIX(FREYJA_VARIANTS.out, params.barcodes)
 }
 
 workflow rerun_demix {
-    Channel
-        .fromFilePairs("${params.variants_dir}/SRR*{variants,depths}.tsv")
+    Channel.fromFilePairs("${params.variants_dir}/SRR*{variants,depths}.tsv")
         .map { k, v -> tuple(k, v[1], v[0]) }
         .set { variants_ch }
 
