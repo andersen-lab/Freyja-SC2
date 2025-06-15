@@ -1,6 +1,6 @@
 import pandas as pd
 
-metadata = pd.read_csv('data/all_metadata.csv', index_col=0)
+metadata = pd.read_csv('data/all_metadata.tsv', index_col=0, sep='\t')
 metadata['SRA_published_date'] = pd.to_datetime(metadata['SRA_published_date'])
 
 # Get accessions collected in the week 6 months ago
@@ -14,4 +14,4 @@ metadata = metadata[(metadata['SRA_published_date'] > six_months_ago) &
 
 metadata = metadata[metadata['sample_status'] == 'completed']
 # save index to txt
-metadata.index.to_series().to_csv('data/samples_to_rerun.csv', index=False, header=False)
+metadata.index.to_series().to_csv('data/samples_to_rerun.tsv', index=False, header=False, sep='\t')

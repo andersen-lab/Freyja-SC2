@@ -2,7 +2,7 @@ import os
 import sys
 import pandas as pd
 
-metadata = pd.read_csv('data/all_metadata.csv')
+metadata = pd.read_csv('data/all_metadata.tsv', sep='\t')
 demix = os.listdir('outputs/demix')
 variants = os.listdir('outputs/variants')
 batch_size = int(sys.argv[1])
@@ -26,4 +26,4 @@ for file in variants:
         if f'{sample_id}.demix.tsv' not in demix:
             metadata.loc[metadata['accession'] == sample_id, 'sample_status'] = 'demix_error'
         
-metadata.to_csv('data/all_metadata.csv', index=False)
+metadata.to_csv('data/all_metadata.tsv', index=False, sep='\t')

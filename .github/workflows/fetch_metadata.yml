@@ -66,6 +66,6 @@ jobs:
                 git add data/lineages.yml
                 git add data/last_barcode_update.txt
               fi
-              git add data/all_metadata.csv
+              git add data/all_metadata.tsv
               git commit -m "Update metadata"
               git push

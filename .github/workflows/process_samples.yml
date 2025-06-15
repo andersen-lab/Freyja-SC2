@@ -72,8 +72,7 @@ jobs:
                 nextflow run main.nf \
                   --num_samples $BATCH_SIZE \
                   -profile local \
-                  -entry fetch \
-                  -with-tower
+                  -entry fetch
           
       - name: Aggregate outputs
         run: |
@@ -120,7 +119,7 @@ jobs:
               git config --global user.email "github-actions[bot]@users.noreply.github.com"
               git config --global user.name "github-actions[bot]"
               git remote set-url origin https://github.com/andersen-lab/freyja-sc2
-              git add data/all_metadata.csv
+              git add data/all_metadata.tsv
               git commit -m "Update processed samples"
               git push
 
@@ -128,7 +127,7 @@ jobs:
         run: |
           echo "# Job Summary $(date)" >> $GITHUB_STEP_SUMMARY
           echo "## Job Information" >> $GITHUB_STEP_SUMMARY
-          cat data/all_metadata.csv | rev | cut -f 2 -d , | rev | sort | uniq -c >> $GITHUB_STEP_SUMMARY
+          cat data/all_metadata.tsv | rev | cut -f 2 -d , | rev | sort | uniq -c >> $GITHUB_STEP_SUMMARY
 
       - name: 'Clean workspace'
         if: always()

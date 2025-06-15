@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-metadata = pd.read_csv('data/all_metadata.csv')
+metadata = pd.read_csv('data/all_metadata.tsv', sep='\t')
 original_sample_status = metadata['sample_status']
 
 # Add a new column to the metadata dataframe called 'sample_status' and set it to 'to_run'
@@ -21,4 +21,4 @@ for file in os.listdir('outputs/demix'):
 metadata['sample_status'] = metadata.apply(lambda x: 'fastq_error' if x['sample_status'] == 'fastq_error' else x['sample_status'], axis=1)
 
 print(metadata['sample_status'].value_counts())
-metadata.to_csv('data/all_metadata.csv', index=False)
+metadata.to_csv('data/all_metadata.tsv', index=False, sep='\t')

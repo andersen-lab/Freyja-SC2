@@ -39,7 +39,7 @@ for acc in demix_success:
 accessions = [p.split('/')[-1].split('.')[0] for p in paths_list]
 
 # Create metadata json
-metadata = pd.read_csv('data/all_metadata.csv', index_col=None, low_memory=False)
+metadata = pd.read_csv('data/all_metadata.tsv', index_col=None, low_memory=False, sep='\t')
 metadata = metadata[metadata['accession'].isin(accessions)]
 metadata = metadata[['accession', 'collection_date', 'geo_loc_country', 'geo_loc_region', 'ww_population', 'collected_by', 'ww_surv_target_1_conc','ww_surv_target_1_conc_unit', 'collection_site_id']]
 metadata = metadata.rename(columns={'accession':'sra_accession', 'ww_surv_target_1_conc':'viral_load', 'ww_surv_target_1_conc_unit':'viral_load_unit'})

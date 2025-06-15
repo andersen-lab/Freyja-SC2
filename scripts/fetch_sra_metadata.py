@@ -210,7 +210,7 @@ def main():
 
     # Get sample status from current metadata file
 
-    old_metadata = pd.read_csv('data/all_metadata.csv', index_col=0, low_memory=False)
+    old_metadata = pd.read_csv('data/all_metadata.tsv', index_col=0, low_memory=False, sep='\t')
     sample_status = old_metadata['sample_status']
 
     all_metadata = metadata.join(sample_status, how='left')
@@ -328,7 +328,7 @@ def main():
     all_metadata = all_metadata.sort_values(by='collection_date', ascending=False)
     all_metadata.index.name = 'accession'
 
-    all_metadata.to_csv('data/all_metadata.csv')
+    all_metadata.to_csv('data/all_metadata.tsv', sep='\t')
 
 
 if __name__ == "__main__":

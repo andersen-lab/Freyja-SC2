@@ -46,4 +46,4 @@ In addition, to the above search terms, we exclude accessions that don't meet th
 * Missing catchment size (`ww_population`)
 * Missing location (`geo_loc_name`)
 
-To check the status of each accession, please refer to the `sample_status` column in `data/all_metadata.csv`. All currently processed freyja outputs are publicly available via Google Cloud Storage at `gs://outbreak-ww-data`
+To check the status of each accession, please refer to the `sample_status` column in `data/all_metadata.tsv`. All currently processed freyja outputs are publicly available via Google Cloud Storage at `gs://outbreak-ww-data`

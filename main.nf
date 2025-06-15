@@ -21,7 +21,7 @@ include {
 
 workflow fetch {
     Channel.fromPath(params.sra_metadata)
-        .splitCsv(header: true, sep: ',')
+        .splitCsv(header: true, sep: '\t')
         .map { row ->
             def meta = [
                 id: row.accession.toString(),
@@ -33,6 +33,8 @@ workflow fetch {
         .filter { it[0].sample_status == 'to_run' }
         .take(params.num_samples)
         .set { samples_ch }
+
+    samples_ch.view()
 
 
     samples_ch
