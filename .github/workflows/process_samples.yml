@@ -127,7 +127,7 @@ jobs:
         run: |
           echo "# Job Summary $(date)" >> $GITHUB_STEP_SUMMARY
           echo "## Job Information" >> $GITHUB_STEP_SUMMARY
-          cat data/all_metadata.tsv | rev | cut -f 2 -d , | rev | sort | uniq -c >> $GITHUB_STEP_SUMMARY
+          cat data/all_metadata.tsv | rev | cut -f 2 | rev | sort | uniq -c >> $GITHUB_STEP_SUMMARY
 
       - name: 'Clean workspace'
         if: always()
