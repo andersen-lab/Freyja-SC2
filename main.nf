@@ -34,9 +34,6 @@ workflow fetch {
         .take(params.num_samples)
         .set { samples_ch }
 
-    samples_ch.view()
-
-
     samples_ch
         .map { meta, accession -> accession }
         .collectFile(name: "accession_list.txt", storeDir: "./data") { accession ->
