@@ -2,7 +2,7 @@ name: Process Samples
 
 on:
   schedule:
-    - cron: '0 */1 * * *'
+    - cron: '0 */1 * * SAT'
   workflow_dispatch:
 
 concurrency:
