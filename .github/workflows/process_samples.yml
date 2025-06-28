@@ -121,7 +121,7 @@ jobs:
               python scripts/update_sample_status.py $BATCH_SIZE
       
       - name: 'Commit and push changes'
-        if: ${{ hashFiles('data/all_metadata.tsv') != '' }}
+        if: ${{ hashFiles('data/accession_list.txt') != '' }}
         run: |
               git config --global user.email "github-actions[bot]@users.noreply.github.com"
               git config --global user.name "github-actions[bot]"
@@ -131,7 +131,7 @@ jobs:
               git push
 
       - name: 'Create GitHub Run Summary'
-        if: ${{ hashFiles('data/all_metadata.tsv') != '' }}
+        if: ${{ hashFiles('data/accession_list.txt') != '' }}
         run: |
           echo "# Job Summary $(date)" >> $GITHUB_STEP_SUMMARY
           echo "## Job Information" >> $GITHUB_STEP_SUMMARY
