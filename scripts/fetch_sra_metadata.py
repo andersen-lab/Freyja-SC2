@@ -288,9 +288,7 @@ def main():
     # Keep samples with missing viral load, set to -1.0 to work with Elasticsearch
     all_metadata['ww_surv_target_1_conc'] = pd.to_numeric(all_metadata['ww_surv_target_1_conc'], errors='coerce')
     all_metadata['ww_surv_target_1_conc_unit'] = all_metadata['ww_surv_target_1_conc_unit'].str.lower()
-    all_metadata['ww_surv_target_1_conc_unit'] = all_metadata['ww_surv_target_1_conc_unit'].fillna(-1.0)
-    all_metadata['ww_surv_target_1_conc'] = all_metadata['ww_surv_target_1_conc'].fillna(
-        -1.0)
+ 
     # if units column contains 'copies/ml', convert concentration to copies/l
     mask = all_metadata['ww_surv_target_1_conc_unit'].str.contains('copies/ml', na=False)
     all_metadata.loc[mask, 'ww_surv_target_1_conc'] *= 1000
