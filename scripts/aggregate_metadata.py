@@ -1,15 +1,11 @@
 import os
 import pandas as pd
 
-paths_list = [entry.path for entry in os.scandir('outputs/variants') if 'variants' in entry.name]
-depths_list = [entry.path for entry in os.scandir('outputs/variants') if 'depths' in entry.name]
-
-accessions = [p.split('/')[-1].split('.')[0] for p in paths_list]
-
-# Create metadata json
 metadata = pd.read_csv('data/all_metadata.tsv', index_col=None, low_memory=False, sep='\t')
 metadata = metadata[metadata['sample_status'] == 'completed']
-metadata = metadata[metadata['ww_surv_target_1_conc_unit'] == 'copies/l'] 
+metadata = metadata[metadata['ww_surv_target_1_conc_unit'] == 'copies/l']
+
+metadata['ww_surv_target_1_conc'] = metadata['ww_surv_target_1_conc'].apply(lambda x: pd.NA if x <= 0 else x)
 
 metadata['Geographic_Location'] = metadata['geo_loc_country'] + '/' + metadata['geo_loc_region']
 

@@ -73,6 +73,12 @@ jobs:
                   --num_samples $BATCH_SIZE \
                   -profile local \
                   -entry fetch
+
+      - name: 'Update processed samples'
+        if: ${{ hashFiles('data/accession_list.txt') != '' }}
+        run: |
+              mamba activate freyja-sc2
+              python scripts/update_sample_status.py $BATCH_SIZE
           
       - name: Aggregate outputs
         if: ${{ hashFiles('data/accession_list.txt') != '' }}
@@ -113,12 +119,6 @@ jobs:
           destination: 'outbreak-ww-data/'
           parent: false
           project_id: 'andersen-lab-primary'
-
-      - name: 'Update processed samples'
-        if: ${{ hashFiles('data/accession_list.txt') != '' }}
-        run: |
-              mamba activate freyja-sc2
-              python scripts/update_sample_status.py $BATCH_SIZE
       
       - name: 'Commit and push changes'
         if: ${{ hashFiles('data/accession_list.txt') != '' }}
