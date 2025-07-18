@@ -22,6 +22,9 @@ metadata = metadata[
     ]
 ]
 
+# add empty columns for future use
+for col in ['Biosample', 'ReleaseDate', 'Isolate_Source', 'Length', 'UpdateDate', 'Virus_OrganismName', 'Isolate_Name', 'Bioprojects', 'Host_OrganismName']:
+    metadata[col] = pd.NA
 
 # Rename columns
 metadata = metadata.rename(
