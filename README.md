@@ -7,7 +7,7 @@ Automated SRA downloading, processing and [Freyja](https://github.com/andersen-l
 
 ## Installation
 ```bash
-git clone https://github.com/dylanpilz/freyja-sc2.git
+git clone https://github.com/andersen-lab/Freyja-SC2.git
 cd freyja-sc2
 ```
 
