@@ -26,7 +26,7 @@ nextflow run main.nf -entry [fetch|rerun_demix] -profile [docker|singularity] --
         * `--num_samples` - The number of samples to process per run. (default: 100)
 
     * `rerun_demix` will run freyja demix step on previously generated variants output files in the provided variants directory. This is useful if you want to run Freyja on existing data with a different barcode set.
-        * `--variants_dir` must contain files in the format `[base_name].variants.tsv [base_name].depths.tsv` for each sample.
+        * `--variants_dir` must contain files in the format `[base_name]_variants.tsv [base_name]_depths.tsv` for each sample.
 
     * `--output_dir` - The final output directory. Creates `variants` and `demix`  subdirectories containing respective output files. (default: `./outputs`)
     

@@ -13,7 +13,7 @@ for file in os.listdir('outputs/variants'):
         metadata.loc[metadata['accession'] == sample_id, 'sample_status'] = 'demix_error'
 
 for file in os.listdir('outputs/demix'):
-    if file.endswith('demix.tsv'):
+    if file.endswith('demixed'):
         sample_id = file.split('.')[0]
         metadata.loc[metadata['accession'] == sample_id, 'sample_status'] = 'completed'
 
