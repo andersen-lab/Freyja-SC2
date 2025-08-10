@@ -22,6 +22,7 @@ defaults:
 
 jobs:
   fetch_ncbi_metadata:
+    timeout-minutes: 540
     runs-on: [self-hosted, profchaos]
     steps: 
       - name: Checkout main
