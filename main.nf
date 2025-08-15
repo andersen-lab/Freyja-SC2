@@ -45,7 +45,6 @@ workflow fetch {
 
     SRATOOLS_FASTERQDUMP.out.reads
         .filter { it[0].sample_status == 'to_run' }
-        .filter { it[1].size() != 3 }
         .branch {
             unknown_primer: it[0].primer_scheme == 'unknown'
             known_primer: it[0].primer_scheme != 'unknown'

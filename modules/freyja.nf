@@ -31,6 +31,7 @@ process FREYJA_DEMIX {
         $variants \\
         $depths \\
         --barcodes $barcodes \\
-        --output ${meta.id}.demixed
+        --output ${meta.id}.demixed \\
+        --autoadapt
     """
 }
