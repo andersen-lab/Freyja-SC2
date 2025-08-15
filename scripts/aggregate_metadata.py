@@ -42,14 +42,19 @@ accessions = [p.split('/')[-1].split('.')[0] for p in paths_list]
 metadata = pd.read_csv('data/all_metadata.tsv', index_col=None, low_memory=False, sep='\t')
 metadata = metadata[metadata['accession'].isin(accessions)]
 metadata = metadata[['accession', 'collection_date', 'geo_loc_country', 'geo_loc_region', 'ww_population', 'collected_by', 'ww_surv_target_1_conc','ww_surv_target_1_conc_unit', 'collection_site_id']]
-metadata = metadata.rename(columns={'accession':'sra_accession', 'ww_surv_target_1_conc':'viral_load', 'ww_surv_target_1_conc_unit':'viral_load_unit'})
+metadata = metadata.rename(columns={
+    'accession':'Accession',
+    'collection_date':'Collection_Date',
+    'ww_surv_target_1_conc':'viral_load',
+    'ww_surv_target_1_conc_unit':'viral_load_unit'}
+)
 metadata['ww_population'] = metadata['ww_population'].fillna(-1.0)
-metadata = metadata.drop_duplicates(subset='sra_accession', keep='first')
+metadata = metadata.drop_duplicates(subset='Accession', keep='first')
 
 
 # Check if demix output exists and has coverage > 0
-metadata['demix_success'] = metadata['sra_accession'].isin(demix_success)
-agg_demix = pd.read_json('outputs/aggregate/aggregate_demix_new.json', orient='records', lines=True).drop_duplicates(subset='sra_accession', keep='first')
+metadata['demix_success'] = metadata['Accession'].isin(demix_success)
+agg_demix = pd.read_json('outputs/aggregate/aggregate_demix_new.json', orient='records', lines=True).drop_duplicates(subset='Accession', keep='first')
 
 try:
     metadata['demix_success'] = metadata['sra_accession'].isin(agg_demix['sra_accession']) & (metadata['sra_accession'].isin(demix_success))
