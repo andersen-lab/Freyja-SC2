@@ -305,6 +305,9 @@ def main():
     # For NA values of collected_by, fill with sequenced_by
     all_metadata['collected_by'] = all_metadata['collected_by'].fillna(all_metadata['sequenced_by'])
     
+    # Fill missing primer schemes with 'snap_primers' for SEARCH samples
+    all_metadata.loc[all_metadata['collected_by'].str.contains('SEARCH', na=False), 'amplicon_PCR_primer_scheme'] = all_metadata['amplicon_PCR_primer_scheme'].fillna('snap_primers')
+
     # Create human-readable, unique site_id for each sample
     all_metadata['collection_site_id'] = all_metadata['geo_loc_name'].fillna('') +\
         all_metadata['ww_population'].fillna('').astype(str) +\
