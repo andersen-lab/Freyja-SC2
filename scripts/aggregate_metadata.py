@@ -1,42 +1,41 @@
 import os
 import pandas as pd
-import numpy as np
 
-def get_intervals(accession):
-    try:
-        df_depth = pd.read_csv(f'outputs/variants/{accession}.depths.tsv', sep='\t', header=None, index_col=1)[3]
-    except:
-        return []
-    vec = df_depth >= 10
-    vec = vec.astype(int)
-    if len(vec)==0:
-        return []
-    elif not isinstance(vec, np.ndarray):
-        vec = np.array(vec)
+metadata = pd.read_csv('all_metadata.tsv', index_col=None, low_memory=False, sep='\t')
+metadata = metadata[metadata['sample_status'] == 'completed']
 
-    edges, = np.nonzero(np.diff((vec==0)*1))
-    edge_vec = [edges+1]
-    if vec[0] != 0:
-        edge_vec.insert(0, [0])
-    if vec[-1] != 0:
-        edge_vec.append([len(vec)])
-    edges = np.concatenate(edge_vec)
-    return np.dstack((edges[::2], edges[1::2]))[0]
+# omit ENA samples and limit to USA for now
+metadata = metadata[~metadata['accession'].str.startswith('ERR')]
+metadata = metadata[metadata['geo_loc_country'] == 'USA']
+metadata['Geographic_Location'] = metadata['geo_loc_country'] + '/' + metadata['geo_loc_region']
+metadata = metadata[metadata['Geographic_Location'].notna()]
 
-def format_intervals(intervals):
-    return [{'start': int(i[0]), 'end': int(i[1])} for i in intervals]
+# drop invalid viral load
+metadata['ww_surv_target_1_conc'] = metadata.apply(
+    lambda row: pd.NA if row['ww_surv_target_1_conc_unit'] != 'copies/l' else row['ww_surv_target_1_conc'], axis=1
+)
+metadata['ww_surv_target_1_conc'] = metadata['ww_surv_target_1_conc'].apply(lambda x: pd.NA if pd.notna(x) and x <= 0 else x)
 
-paths_list = [entry.path for entry in os.scandir('outputs/variants') if 'variants' in entry.name]
-depths_list = [entry.path for entry in os.scandir('outputs/variants') if 'depths' in entry.name]
-demix_success = [entry.path.split('.')[0].split('/')[-1] for entry in os.scandir('outputs/demix') if 'demix' in entry.name]
+# Select relevant columns 
+metadata = metadata[
+    [
+        'accession', 
+        'collection_date', 
+        'Geographic_Location',
+        'ww_population', 
+        'collected_by', 
+        'ww_surv_target_1_conc', 
+        'collection_site_id'
+    ]
+]
 
-for acc in demix_success:
-    with open(f'outputs/demix/{acc}.demix.tsv', 'r') as f:
-        lines = f.readlines()
-        if len(lines[2].split(' ')) == 1:
-            demix_success.remove(acc)
+# empty string columns
+for col in ['Biosample', 'Isolate_Source', 'Isolate_Name', 'Bioprojects', 'Virus_OrganismName', 'Host_OrganismName']:
+    metadata[col] = 'NA'
 
-accessions = [p.split('/')[-1].split('.')[0] for p in paths_list]
+# empty date columns
+for col in ['ReleaseDate', 'UpdateDate']:
+    metadata[col] = pd.to_datetime("1970-01-01")
 
 # Create metadata json
 metadata = pd.read_csv('data/all_metadata.tsv', index_col=None, low_memory=False, sep='\t')
@@ -76,4 +75,4 @@ metadata['coverage_intervals'] = metadata['sra_accession'].apply(get_intervals)
 metadata['coverage_intervals'] = metadata['coverage_intervals'].apply(format_intervals)
 
 os.makedirs('outputs/aggregate', exist_ok=True)
-metadata.to_json('outputs/aggregate/aggregate_metadata_new.json', orient='records', lines=True)
+metadata.to_csv('outputs/aggregate/aggregate_metadata.tsv', index=False, sep='\t')

@@ -51,7 +51,7 @@ def process_depth_file(acc):
     SPIKE_START = 21563
     SPIKE_END = 25384
 
-    depth_file = f'{acc}.depths.tsv'
+    depth_file = f'{acc}_depths.tsv'
 
     if not os.path.exists(f'outputs/variants/{depth_file}') and not os.path.exists(f'demix_rerun/{depth_file}'):
         print(f'No depth file found for {depth_file}')
