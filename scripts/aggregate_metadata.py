@@ -1,14 +1,26 @@
 import os
 import pandas as pd
+from epiweeks import Week
 
-metadata = pd.read_csv('all_metadata.tsv', index_col=None, low_memory=False, sep='\t')
+STATE_TO_REGION = {
+    'Connecticut': 'Northeast', 'Maine': 'Northeast', 'Massachusetts': 'Northeast', 'New Hampshire': 'Northeast', 
+    'Rhode Island': 'Northeast', 'Vermont': 'Northeast', 'New Jersey': 'Northeast', 'New York': 'Northeast', 
+    'Pennsylvania': 'Northeast', 'Illinois': 'Midwest', 'Indiana': 'Midwest', 'Michigan': 'Midwest', 
+    'Ohio': 'Midwest', 'Wisconsin': 'Midwest', 'Iowa': 'Midwest', 'Kansas': 'Midwest', 'Minnesota': 'Midwest', 
+    'Missouri': 'Midwest', 'Nebraska': 'Midwest', 'North Dakota': 'Midwest', 'South Dakota': 'Midwest', 
+    'Delaware': 'South', 'Maryland': 'South', 'Florida': 'South', 'Georgia': 'South', 'North Carolina': 'South', 
+    'South Carolina': 'South', 'Virginia': 'South', 'District of Columbia': 'South', 'West Virginia': 'South', 
+    'Alabama': 'South', 'Kentucky': 'South', 'Mississippi': 'South', 'Tennessee': 'South', 'Arkansas': 'South', 
+    'Louisiana': 'South', 'Oklahoma': 'South', 'Texas': 'South', 'Arizona': 'West', 'Colorado': 'West', 
+    'Idaho': 'West', 'Montana': 'West', 'Nevada': 'West', 'New Mexico': 'West', 'Utah': 'West', 'Wyoming': 'West', 
+    'Alaska': 'West', 'California': 'West', 'Hawaii': 'West', 'Oregon': 'West', 'Washington': 'West'
+}
+
+metadata = pd.read_csv('data/all_metadata.tsv', index_col=None, low_memory=False, sep='\t')
 metadata = metadata[metadata['sample_status'] == 'completed']
 
-# omit ENA samples and limit to USA for now
+# omit ENA samples for now
 metadata = metadata[~metadata['accession'].str.startswith('ERR')]
-metadata = metadata[metadata['geo_loc_country'] == 'USA']
-metadata['Geographic_Location'] = metadata['geo_loc_country'] + '/' + metadata['geo_loc_region']
-metadata = metadata[metadata['Geographic_Location'].notna()]
 
 # drop invalid viral load
 metadata['ww_surv_target_1_conc'] = metadata.apply(
@@ -16,12 +28,24 @@ metadata['ww_surv_target_1_conc'] = metadata.apply(
 )
 metadata['ww_surv_target_1_conc'] = metadata['ww_surv_target_1_conc'].apply(lambda x: pd.NA if pd.notna(x) and x <= 0 else x)
 
+metadata = metadata[metadata['geo_loc_country'] == 'USA']
+metadata['census_region'] = metadata['geo_loc_region'].map(STATE_TO_REGION)
+metadata['Geographic_Location'] = metadata['geo_loc_country'] + '/' + metadata['geo_loc_region']
+metadata = metadata[metadata['Geographic_Location'].notna()]
+
+metadata['epiweek'] = metadata['collection_date'].apply(lambda x: Week.fromdate(x))
+
+
+# Convert collection date to epiweek
+
 # Select relevant columns 
 metadata = metadata[
     [
         'accession', 
         'collection_date', 
+        'epiweek',
         'Geographic_Location',
+        'census_region',
         'ww_population', 
         'collected_by', 
         'ww_surv_target_1_conc', 
@@ -37,42 +61,20 @@ for col in ['Biosample', 'Isolate_Source', 'Isolate_Name', 'Bioprojects', 'Virus
 for col in ['ReleaseDate', 'UpdateDate']:
     metadata[col] = pd.to_datetime("1970-01-01")
 
-# Create metadata json
-metadata = pd.read_csv('data/all_metadata.tsv', index_col=None, low_memory=False, sep='\t')
-metadata = metadata[metadata['accession'].isin(accessions)]
-metadata = metadata[['accession', 'collection_date', 'geo_loc_country', 'geo_loc_region', 'ww_population', 'collected_by', 'ww_surv_target_1_conc','ww_surv_target_1_conc_unit', 'collection_site_id']]
-metadata = metadata.rename(columns={
-    'accession':'Accession',
-    'collection_date':'Collection_Date',
-    'ww_surv_target_1_conc':'viral_load',
-    'ww_surv_target_1_conc_unit':'viral_load_unit'}
+
+# empty integer columns
+for col in ['Length']:
+    metadata[col] = 0
+
+# Rename columns
+metadata = metadata.rename(
+    columns={
+        'accession': 'Accession',
+        'collection_date': 'Collection_Date',
+        'ww_population': 'population',
+        'ww_surv_target_1_conc': 'viral_load',
+        'collection_site_id': 'site_id',
+    }
 )
-metadata['ww_population'] = metadata['ww_population'].fillna(-1.0)
-metadata = metadata.drop_duplicates(subset='Accession', keep='first')
 
-
-# Check if demix output exists and has coverage > 0
-metadata['demix_success'] = metadata['Accession'].isin(demix_success)
-agg_demix = pd.read_json('outputs/aggregate/aggregate_demix_new.json', orient='records', lines=True).drop_duplicates(subset='Accession', keep='first')
-
-try:
-    metadata['demix_success'] = metadata['sra_accession'].isin(agg_demix['sra_accession']) & (metadata['sra_accession'].isin(demix_success))
-except:
-    metadata['demix_success'] = False
-
-agg_variants = pd.read_json('outputs/aggregate/aggregate_variants_new.json', orient='records', lines=True).drop_duplicates(subset='sra_accession', keep='first')
-
-
-try:
-    metadata['variants_success'] = metadata['sra_accession'].isin(agg_variants['sra_accession'])
-except KeyError:
-    metadata['variants_success'] = False
-
-# if variants_success is false, set demix_success to false
-metadata['demix_success'] = np.where(metadata['variants_success']==False, False, metadata['demix_success'])
-
-metadata['coverage_intervals'] = metadata['sra_accession'].apply(get_intervals)
-metadata['coverage_intervals'] = metadata['coverage_intervals'].apply(format_intervals)
-
-os.makedirs('outputs/aggregate', exist_ok=True)
 metadata.to_csv('outputs/aggregate/aggregate_metadata.tsv', index=False, sep='\t')
