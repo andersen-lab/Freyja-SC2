@@ -285,17 +285,17 @@ def main():
     all_metadata = all_metadata[['amplicon_PCR_primer_scheme', 'collected_by', 'sequenced_by',
                                  'geo_loc_name', 'geo_loc_country', 'geo_loc_region', 'collection_date', 'SRA_published_date', 'ww_population', 'ww_surv_target_1_conc','ww_surv_target_1_conc_unit', 'sample_status']]
 
-    # Keep samples with missing viral load, set to -1.0 to work with Elasticsearch
     all_metadata['ww_surv_target_1_conc'] = pd.to_numeric(all_metadata['ww_surv_target_1_conc'], errors='coerce')
     all_metadata['ww_surv_target_1_conc_unit'] = all_metadata['ww_surv_target_1_conc_unit'].str.lower()
  
-    # if units column contains 'copies/ml', convert concentration to copies/l
     mask = all_metadata['ww_surv_target_1_conc_unit'].str.contains('copies/ml', na=False)
     all_metadata.loc[mask, 'ww_surv_target_1_conc'] *= 1000
     all_metadata.loc[mask, 'ww_surv_target_1_conc_unit'] = 'copies/l'
 
+    mask = all_metadata['ww_surv_target_1_conc_unit'].str.contains('copies/mg', na=False)
+    all_metadata.loc[mask, 'ww_surv_target_1_conc'] *= 1000
+    all_metadata.loc[mask, 'ww_surv_target_1_conc_unit'] = 'copies/g'
 
-    # If unit contains the substring 'copies/g', set unit to 'copies/g'
     all_metadata.loc[all_metadata['ww_surv_target_1_conc_unit'].str.contains('copies/g', na=False), 'ww_surv_target_1_conc_unit'] = 'copies/g'
     all_metadata.loc[all_metadata['ww_surv_target_1_conc_unit'].str.contains('copies/l', na=False), 'ww_surv_target_1_conc_unit'] = 'copies/l'
 
