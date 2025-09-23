@@ -1,6 +1,4 @@
-import os
 import pandas as pd
-from epiweeks import Week
 
 STATE_TO_REGION = {
     'Connecticut': 'Northeast', 'Maine': 'Northeast', 'Massachusetts': 'Northeast', 'New Hampshire': 'Northeast', 
@@ -33,17 +31,11 @@ metadata['census_region'] = metadata['geo_loc_region'].map(STATE_TO_REGION)
 metadata['Geographic_Location'] = metadata['geo_loc_country'] + '/' + metadata['geo_loc_region']
 metadata = metadata[metadata['Geographic_Location'].notna()]
 
-metadata['epiweek'] = metadata['collection_date'].apply(lambda x: Week.fromdate(x))
-
-
-# Convert collection date to epiweek
-
 # Select relevant columns 
 metadata = metadata[
     [
         'accession', 
         'collection_date', 
-        'epiweek',
         'Geographic_Location',
         'census_region',
         'ww_population', 
