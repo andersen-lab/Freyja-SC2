@@ -2,7 +2,7 @@ name: Update NCBI metadata
 
 on:
   schedule:
-    - cron: '0 18 * * FRI'
+    - cron: "0 18 * * FRI"
 
   workflow_dispatch:
 
@@ -24,7 +24,7 @@ jobs:
   fetch_ncbi_metadata:
     timeout-minutes: 540
     runs-on: [self-hosted, profchaos]
-    steps: 
+    steps:
       - name: Checkout main
         uses: actions/checkout@v4
         with:
@@ -42,31 +42,31 @@ jobs:
             env-${{ env.NXF_VER }}-${{ github.job }}
             env-${{ env.NXF_VER }}
             env-
-      - name: 'Check and setup conda environment'
-        run: | 
+      - name: "Check and setup conda environment"
+        run: |
           mamba env update --name freyja-sc2 --file environment.yml --prune
       - name: Fetch NCBI metadata
         run: |
           mamba activate freyja-sc2
           python scripts/fetch_sra_metadata.py
 
-      - name: 'Get updated barcodes and lineages from Freyja repo'
+      - name: "Get updated barcodes and lineages from Freyja repo"
         run: |
-              git clone http://github.com/andersen-lab/Freyja
-              cp Freyja/freyja/data/usher_barcodes.feather data/
-              cp Freyja/freyja/data/lineages.yml data/
-              cp Freyja/freyja/data/last_barcode_update.txt data/
+          git clone https://github.com/andersen-lab/Freyja.git
+          cp Freyja/freyja/data/usher_barcodes.feather data/
+          cp Freyja/freyja/data/lineages.yml data/
+          cp Freyja/freyja/data/last_barcode_update.txt data/
 
-      - name: 'Commit and push changes'
+      - name: "Commit and push changes"
         run: |
-              git config --global user.email "github-actions[bot]@users.noreply.github.com"
-              git config --global user.name "github-actions[bot]"
-              git remote set-url origin https://github.com/andersen-lab/Freyja-SC2.git
-              if [[($(git status data/usher_barcodes.feather --porcelain | wc -c) -ne 0)]]; then
-                git add data/usher_barcodes.feather
-                git add data/lineages.yml
-                git add data/last_barcode_update.txt
-              fi
-              git add data/all_metadata.tsv
-              git commit -m "Update metadata"
-              git push
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git remote set-url origin https://github.com/andersen-lab/Freyja-SC2.git
+          if [[($(git status data/usher_barcodes.feather --porcelain | wc -c) -ne 0)]]; then
+            git add data/usher_barcodes.feather
+            git add data/lineages.yml
+            git add data/last_barcode_update.txt
+          fi
+          git add data/all_metadata.tsv
+          git commit -m "Update metadata"
+          git push
