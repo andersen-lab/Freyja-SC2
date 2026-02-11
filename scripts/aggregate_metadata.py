@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 
 STATE_TO_REGION = {
     'Connecticut': 'Northeast', 'Maine': 'Northeast', 'Massachusetts': 'Northeast', 'New Hampshire': 'Northeast', 
@@ -44,7 +45,7 @@ metadata = metadata[
         'collection_site_id'
     ]
 ]
-
+#Isolate_Source', 'Bioprojects', 'population', 'Biosample', 'ReleaseDate', 'site_id', 'Virus_OrganismName', 'UpdateDate', 'Isolate_Name', 'census_region', 'Host_OrganismName', 'Length', 'Geographic_Location', 'Accession', 'viral_load', 'Collection_Date'
 # empty string columns
 for col in ['Biosample', 'Isolate_Source', 'Isolate_Name', 'Bioprojects', 'Virus_OrganismName', 'Host_OrganismName']:
     metadata[col] = 'NA'
@@ -69,4 +70,5 @@ metadata = metadata.rename(
     }
 )
 
-metadata.to_csv('outputs/aggregate/aggregate_metadata.tsv', index=False, sep='\t')
+os.makedirs('muninn_sc2_input', exist_ok=True)
+metadata.to_csv('muninn_sc2_input/aggregate_metadata.tsv', index=False, sep='\t')
