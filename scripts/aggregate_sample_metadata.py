@@ -1,5 +1,5 @@
 import pandas as pd
-import os
+from epiweeks import Week
 
 STATE_TO_REGION = {
     'Connecticut': 'Northeast', 'Maine': 'Northeast', 'Massachusetts': 'Northeast', 'New Hampshire': 'Northeast', 
@@ -15,7 +15,7 @@ STATE_TO_REGION = {
     'Alaska': 'West', 'California': 'West', 'Hawaii': 'West', 'Oregon': 'West', 'Washington': 'West'
 }
 
-metadata = pd.read_csv('data/all_metadata.tsv', index_col=None, low_memory=False, sep='\t')
+metadata = pd.read_csv('all_metadata.tsv', index_col=None, low_memory=False, sep='\t')
 metadata = metadata[metadata['sample_status'] == 'completed']
 
 # omit ENA samples for now
@@ -32,11 +32,16 @@ metadata['census_region'] = metadata['geo_loc_region'].map(STATE_TO_REGION)
 metadata['Geographic_Location'] = metadata['geo_loc_country'] + '/' + metadata['geo_loc_region']
 metadata = metadata[metadata['Geographic_Location'].notna()]
 
+metadata['epiweek'] = metadata['collection_date'].apply(lambda x: Week.fromdate(x))
+
+# Convert collection date to epiweek
+
 # Select relevant columns 
 metadata = metadata[
     [
         'accession', 
         'collection_date', 
+        'epiweek',
         'Geographic_Location',
         'census_region',
         'ww_population', 
@@ -45,7 +50,7 @@ metadata = metadata[
         'collection_site_id'
     ]
 ]
-#Isolate_Source', 'Bioprojects', 'population', 'Biosample', 'ReleaseDate', 'site_id', 'Virus_OrganismName', 'UpdateDate', 'Isolate_Name', 'census_region', 'Host_OrganismName', 'Length', 'Geographic_Location', 'Accession', 'viral_load', 'Collection_Date'
+
 # empty string columns
 for col in ['Biosample', 'Isolate_Source', 'Isolate_Name', 'Bioprojects', 'Virus_OrganismName', 'Host_OrganismName']:
     metadata[col] = 'NA'
@@ -70,5 +75,4 @@ metadata = metadata.rename(
     }
 )
 
-os.makedirs('muninn_sc2_input', exist_ok=True)
-metadata.to_csv('muninn_sc2_input/aggregate_metadata.tsv', index=False, sep='\t')
+metadata.to_csv('aggregate_metadata.tsv', index=False, sep='\t')

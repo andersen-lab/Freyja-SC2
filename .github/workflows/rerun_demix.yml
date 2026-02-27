@@ -47,20 +47,7 @@ jobs:
       - name: 'Check and setup conda environment'
         run: | 
           mamba env update --name freyja-sc2 --file environment.yml --prune
-
-      - id: 'auth'
-        name: 'Authenticate with gcloud'
-        uses: 'google-github-actions/auth@v2'
-        with:
-          workload_identity_provider: 'projects/12767718289/locations/global/workloadIdentityPools/outbreak-ww/providers/freyja-sc2'
-          service_account: 'outbreak-ww@andersen-lab-primary.iam.gserviceaccount.com'
-
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v2'
-        with:
-          version: '>= 363.0.0'
           
-
       - name: 'Get samples to re-run'
         run: |
               mkdir demix_rerun
@@ -81,43 +68,5 @@ jobs:
                 -profile local \
                 --accession_list data/samples_to_rerun.csv \
                 --variants_dir demix_rerun
-
-      - name: 'Aggregate demix results'
-        run: |
-              mamba activate freyja-sc2
-              python scripts/aggregate_demix.py
-
-      - name: 'Replace old demix results'
-        run: |
-              mamba activate freyja-sc2
-              gcloud storage cp gs://outbreak-ww-data/aggregate/aggregate_demix.json outputs/aggregate/aggregate_demix.json
-              gcloud storage cp gs://outbreak-ww-data/aggregate/aggregate_metadata.json outputs/aggregate/aggregate_metadata.json
-              python scripts/update_aggregate_demix.py
-              rm -rf outputs/aggregate/aggregate_demix_new.json
-
-      - name: 'Aggregate demix by week'
-        run: |
-              mamba activate freyja-sc2
-              python scripts/aggregate_demix_by_week.py
-
-      - id: 'upload-demix'
-        name: 'Upload Demix to Cloud Storage'
-        uses: 'google-github-actions/upload-cloud-storage@v2'
-        with:
-          path: 'outputs/demix'
-          destination: 'outbreak-ww-data/demix/'
-          parent: false
-          project_id: 'andersen-lab-primary'
-
-      - id: 'upload-aggregate'
-        name: 'Upload Aggregate to Cloud Storage'
-        uses: 'google-github-actions/upload-cloud-storage@v2'
-        with:
-          path: 'outputs/aggregate'
-          destination: 'outbreak-ww-data/aggregate/'
-          parent: false
-          project_id: 'andersen-lab-primary'
-
-
 
 

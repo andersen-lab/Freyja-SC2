@@ -29,8 +29,4 @@ runs:
       uses: nf-core/setup-nextflow@v2
       with:
         version: ${{ env.NXF_VER }}
-    - name: 'Set up Cloud SDK'
-      uses: 'google-github-actions/setup-gcloud@v2'
-      with:
-        version: '>= 363.0.0'
       

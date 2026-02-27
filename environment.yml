@@ -10,7 +10,6 @@ dependencies:
   - conda-forge::pigz=2.8  
   - conda-forge::python=3.11
   - conda-forge::pyarrow
-  - conda-forge::google-cloud-sdk=458.0.1
   - pip
   - pip:
     - epiweeks
