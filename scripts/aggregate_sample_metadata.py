@@ -12,10 +12,11 @@ STATE_TO_REGION = {
     'Alabama': 'South', 'Kentucky': 'South', 'Mississippi': 'South', 'Tennessee': 'South', 'Arkansas': 'South', 
     'Louisiana': 'South', 'Oklahoma': 'South', 'Texas': 'South', 'Arizona': 'West', 'Colorado': 'West', 
     'Idaho': 'West', 'Montana': 'West', 'Nevada': 'West', 'New Mexico': 'West', 'Utah': 'West', 'Wyoming': 'West', 
-    'Alaska': 'West', 'California': 'West', 'Hawaii': 'West', 'Oregon': 'West', 'Washington': 'West'
+    'Alaska': 'West', 'California': 'West', 'Hawaii': 'West', 'Oregon': 'West', 'Washington': 'West',
+    'Guam': 'U.S. Territories', 'Puerto Rico': 'U.S. Territories', 'U.S. Virgin Islands': 'U.S. Territories'
 }
 
-metadata = pd.read_csv('all_metadata.tsv', index_col=None, low_memory=False, sep='\t')
+metadata = pd.read_csv('data/all_metadata.tsv', index_col=None, low_memory=False, sep='\t')
 metadata = metadata[metadata['sample_status'] == 'completed']
 
 # omit ENA samples for now
@@ -34,6 +35,9 @@ metadata = metadata[metadata['Geographic_Location'].notna()]
 
 metadata['epiweek'] = metadata['collection_date'].apply(lambda x: Week.fromdate(x))
 
+# Remove illegal characters 
+metadata['collected_by'] = metadata.collected_by.str.replace(';', ' ').replace('/', ' ').replace(',', ' ')
+                    
 # Convert collection date to epiweek
 
 # Select relevant columns 
@@ -41,7 +45,6 @@ metadata = metadata[
     [
         'accession', 
         'collection_date', 
-        'epiweek',
         'Geographic_Location',
         'census_region',
         'ww_population', 
@@ -75,4 +78,4 @@ metadata = metadata.rename(
     }
 )
 
-metadata.to_csv('aggregate_metadata.tsv', index=False, sep='\t')
+metadata.to_csv('all_sra_outputs/sample_metadata.tsv', index=False, sep='\t')
