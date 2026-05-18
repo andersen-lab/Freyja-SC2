@@ -11,6 +11,12 @@ variants_rerun
 aggregate_demix.tsv
 bam
 
+muninn_sc2_ww_ingestion/
+all_sra_outputs/
+san_diego/
+*.demix*
+*.variants*
+*.depths*
 # vscode
 .vscode
 
