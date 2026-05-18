@@ -8,7 +8,15 @@ import urllib.error
 import hashlib
 import time
 
-us_state_to_abbrev = {
+PRIMER_SCHEMA = {
+    'v5.3': 'ARTICv5.3.2',
+    'v4.1': 'ARTICv4.1',
+    'v3': 'ARTICv3',
+    'qiaseq': 'ARTICv3',
+    'snap': 'snap_primers'
+}
+
+US_STATE_TO_ABBREV = {
     "Alabama": "AL",
     "Alaska": "AK",
     "Arizona": "AZ",
@@ -261,15 +269,6 @@ def main():
 
     print('Samples with valid population: ', len(all_metadata))
 
-    # Parse primer scheme
-    PRIMER_SCHEMA = {
-        'v5.3': 'ARTICv5.3.2',
-        'v4.1': 'ARTICv4.1',
-        'v3': 'ARTICv3',
-        'qiaseq': 'ARTICv3',
-        'snap': 'snap_primers'
-    }
-
     def match_primer_scheme(primer_str):
         if pd.isna(primer_str):
             return 'unknown'
@@ -285,9 +284,12 @@ def main():
     all_metadata = all_metadata[['amplicon_PCR_primer_scheme', 'collected_by', 'sequenced_by',
                                  'geo_loc_name', 'geo_loc_country', 'geo_loc_region', 'collection_date', 'SRA_published_date', 'ww_population', 'ww_surv_target_1_conc','ww_surv_target_1_conc_unit', 'sample_status']]
 
+
+    # TODO: Convert copies/g into copies/L by taking the mean, subtract and divide out by variance
     all_metadata['ww_surv_target_1_conc'] = pd.to_numeric(all_metadata['ww_surv_target_1_conc'], errors='coerce')
     all_metadata['ww_surv_target_1_conc_unit'] = all_metadata['ww_surv_target_1_conc_unit'].str.lower()
  
+
     mask = all_metadata['ww_surv_target_1_conc_unit'].str.contains('copies/ml', na=False)
     all_metadata.loc[mask, 'ww_surv_target_1_conc'] *= 1000
     all_metadata.loc[mask, 'ww_surv_target_1_conc_unit'] = 'copies/l'
@@ -317,7 +319,7 @@ def main():
 
     all_metadata['collection_site_id'] = all_metadata['collection_site_id'].apply(md5_hash)
     all_metadata['collection_site_id'] = all_metadata['geo_loc_country'] + '_' + all_metadata['geo_loc_region'].apply(
-        lambda x: us_state_to_abbrev[x] if x in us_state_to_abbrev else x) + '_' + all_metadata['collection_site_id']
+        lambda x: US_STATE_TO_ABBREV[x] if x in US_STATE_TO_ABBREV else x) + '_' + all_metadata['collection_site_id']
 
     # Select samples to run
     all_metadata['sample_status'] = all_metadata['sample_status'].fillna('to_run')

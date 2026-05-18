@@ -1,6 +1,15 @@
 import os
+import argparse
 
-demixed_dir = 'all_sra_outputs/demixed'
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    '-i', '--input-dir',
+    required=True,
+    help='Directory containing *.demix.tsv - modifies these files in-place',
+)
+
+args = parser.parse_args()
+demixed_dir = os.path(args.input_dir)
 
 for file in os.listdir(demixed_dir):
     if file.endswith('.demixed'):

@@ -1,6 +1,16 @@
 import pandas as pd
 from epiweeks import Week
 
+import argparse 
+
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    '-o', '--output-dir',
+    required=True,
+    help='Directory to save formatted sample metadata',
+)
+args = parser.parse_args()
+
 STATE_TO_REGION = {
     'Connecticut': 'Northeast', 'Maine': 'Northeast', 'Massachusetts': 'Northeast', 'New Hampshire': 'Northeast', 
     'Rhode Island': 'Northeast', 'Vermont': 'Northeast', 'New Jersey': 'Northeast', 'New York': 'Northeast', 
@@ -78,4 +88,4 @@ metadata = metadata.rename(
     }
 )
 
-metadata.to_csv('all_sra_outputs/sample_metadata.tsv', index=False, sep='\t')
+metadata.to_csv(f'${args.output_dir}/sample_metadata.tsv', index=False, sep='\t')

@@ -1,11 +1,32 @@
 """
 Aggregate iVar variants output from multiple samples into a single TSV file.
 """
+import argparse
 import os
+
 import pandas as pd
 
+
 def main():
-    paths_list = [os.path.join('all_sra_outputs/variants', fname) for fname in os.listdir('all_sra_outputs/variants') if 'variants' in fname]
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-i', '--input-dir',
+        required=True,
+        help='Directory containing *.variants.tsv and *.depths.tsv',
+    )
+    parser.add_argument(
+        '-o', '--output-dir',
+        required=True,
+        help='Directory for aggregated variants_sc2.tsv output',
+    )
+    args = parser.parse_args()
+
+    variants_dir = os.path(args.input_dir)
+    paths_list = [
+        os.path.join(variants_dir, fname)
+        for fname in os.listdir(variants_dir)
+        if 'variants' in fname
+    ]
     variants_list = []
 
     for var_path in paths_list:
@@ -22,11 +43,15 @@ def main():
             df['SRA'] = os.path.basename(var_path).split('.')[0]
             variants_list.append(df.copy())
 
-    # Concatenate all dataframes at once
     if variants_list:
         variants = pd.concat(variants_list, axis=0)
-        os.makedirs('muninn_sc2_input', exist_ok=True)
-        variants.to_csv('muninn_sc2_input/variants_sc2.tsv', sep='\t', index=False)
+        os.makedirs(args.output_dir, exist_ok=True)
+        variants.to_csv(
+            os.path.join(args.output_dir, 'variants_sc2.tsv'),
+            sep='\t',
+            index=False,
+        )
+
 
 if __name__ == '__main__':
     main()
