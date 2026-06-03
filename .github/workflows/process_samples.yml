@@ -2,7 +2,7 @@ name: Process Samples
 
 on:
   schedule:
-    - cron: '0 */1 * * *'
+    - cron: '0 */1 * * SAT'
   workflow_dispatch:
 
 concurrency:
@@ -16,7 +16,7 @@ env:
   TOWER_ACCESS_TOKEN: ${{ secrets.TOWER_ACCESS_TOKEN }}
   TOWER_WORKSPACE_ID: ${{ secrets.TOWER_WORKSPACE_ID }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  BATCH_SIZE: 75
+  BATCH_SIZE: 125
 
 
 defaults:
