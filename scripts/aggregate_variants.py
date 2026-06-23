@@ -21,7 +21,7 @@ def main():
     )
     args = parser.parse_args()
 
-    variants_dir = os.path(args.input_dir)
+    variants_dir = args.input_dir
     paths_list = [
         os.path.join(variants_dir, fname)
         for fname in os.listdir(variants_dir)

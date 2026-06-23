@@ -1,8 +1,7 @@
 name: Process Samples
 
 on:
-  schedule:
-    - cron: '0 */1 * * SAT'
+  workflow_call:
   workflow_dispatch:
 
 concurrency:
@@ -84,6 +83,17 @@ jobs:
           destination: 'outbreak-ww-data/'
           parent: false
           project_id: 'andersen-lab-primary'
+
+      - name: 'Upload run outputs for muninn ingestion'
+        if: ${{ hashFiles('data/accession_list.txt') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: run-outputs
+          path: |
+            outputs/variants
+            outputs/demix
+          if-no-files-found: ignore
+          retention-days: 1
       
       - name: 'Commit and push changes'
         if: ${{ hashFiles('data/accession_list.txt') != '' }}

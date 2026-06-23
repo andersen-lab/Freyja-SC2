@@ -1,9 +1,7 @@
 name: Update NCBI metadata
 
 on:
-  schedule:
-    - cron: "0 18 * * FRI"
-
+  workflow_call:
   workflow_dispatch:
 
 concurrency:

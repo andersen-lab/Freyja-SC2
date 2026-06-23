@@ -88,4 +88,4 @@ metadata = metadata.rename(
     }
 )
 
-metadata.to_csv(f'${args.output_dir}/sample_metadata.tsv', index=False, sep='\t')
+metadata.to_csv(f'{args.output_dir}/sample_metadata.tsv', index=False, sep='\t')

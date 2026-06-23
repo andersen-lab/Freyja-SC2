@@ -1,0 +1,32 @@
+name: Daily Update
+
+on:
+  schedule:
+    # Note: GitHub Actions cron runs in UTC. Adjust the hour to hit local
+    # midnight on the self-hosted runner if needed.
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
+# Keep a distinct group from the reusable child workflows (which use
+# ${{ github.repository }}) to avoid a concurrency self-deadlock.
+concurrency:
+  group: daily-update-${{ github.ref }}
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  fetch_metadata:
+    uses: ./.github/workflows/fetch_metadata.yml
+    secrets: inherit
+
+  process_samples:
+    needs: fetch_metadata
+    uses: ./.github/workflows/process_samples.yml
+    secrets: inherit
+
+  muninn_ingest:
+    needs: process_samples
+    uses: ./.github/workflows/muninn_ingestion.yml
+    secrets: inherit
