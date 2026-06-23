@@ -8,7 +8,15 @@ import urllib.error
 import hashlib
 import time
 
-us_state_to_abbrev = {
+PRIMER_SCHEMA = {
+    'v5.3': 'ARTICv5.3.2',
+    'v4.1': 'ARTICv4.1',
+    'v3': 'ARTICv3',
+    'qiaseq': 'ARTICv3',
+    'snap': 'snap_primers'
+}
+
+US_STATE_TO_ABBREV = {
     "Alabama": "AL",
     "Alaska": "AK",
     "Arizona": "AZ",
@@ -261,15 +269,6 @@ def main():
 
     print('Samples with valid population: ', len(all_metadata))
 
-    # Parse primer scheme
-    PRIMER_SCHEMA = {
-        'v5.3': 'ARTICv5.3.2',
-        'v4.1': 'ARTICv4.1',
-        'v3': 'ARTICv3',
-        'qiaseq': 'ARTICv3',
-        'snap': 'snap_primers'
-    }
-
     def match_primer_scheme(primer_str):
         if pd.isna(primer_str):
             return 'unknown'
@@ -285,19 +284,20 @@ def main():
     all_metadata = all_metadata[['amplicon_PCR_primer_scheme', 'collected_by', 'sequenced_by',
                                  'geo_loc_name', 'geo_loc_country', 'geo_loc_region', 'collection_date', 'SRA_published_date', 'ww_population', 'ww_surv_target_1_conc','ww_surv_target_1_conc_unit', 'sample_status']]
 
-    # Keep samples with missing viral load, set to -1.0 to work with Elasticsearch
+
+    # TODO: Convert copies/g into copies/L by taking the mean, subtract and divide out by variance
     all_metadata['ww_surv_target_1_conc'] = pd.to_numeric(all_metadata['ww_surv_target_1_conc'], errors='coerce')
     all_metadata['ww_surv_target_1_conc_unit'] = all_metadata['ww_surv_target_1_conc_unit'].str.lower()
-    all_metadata['ww_surv_target_1_conc_unit'] = all_metadata['ww_surv_target_1_conc_unit'].fillna(-1.0)
-    all_metadata['ww_surv_target_1_conc'] = all_metadata['ww_surv_target_1_conc'].fillna(
-        -1.0)
-    # if units column contains 'copies/ml', convert concentration to copies/l
+ 
+
     mask = all_metadata['ww_surv_target_1_conc_unit'].str.contains('copies/ml', na=False)
     all_metadata.loc[mask, 'ww_surv_target_1_conc'] *= 1000
     all_metadata.loc[mask, 'ww_surv_target_1_conc_unit'] = 'copies/l'
 
+    mask = all_metadata['ww_surv_target_1_conc_unit'].str.contains('copies/mg', na=False)
+    all_metadata.loc[mask, 'ww_surv_target_1_conc'] *= 1000
+    all_metadata.loc[mask, 'ww_surv_target_1_conc_unit'] = 'copies/g'
 
-    # If unit contains the substring 'copies/g', set unit to 'copies/g'
     all_metadata.loc[all_metadata['ww_surv_target_1_conc_unit'].str.contains('copies/g', na=False), 'ww_surv_target_1_conc_unit'] = 'copies/g'
     all_metadata.loc[all_metadata['ww_surv_target_1_conc_unit'].str.contains('copies/l', na=False), 'ww_surv_target_1_conc_unit'] = 'copies/l'
 
@@ -307,6 +307,9 @@ def main():
     # For NA values of collected_by, fill with sequenced_by
     all_metadata['collected_by'] = all_metadata['collected_by'].fillna(all_metadata['sequenced_by'])
     
+    # Fill missing primer schemes with 'snap_primers' for SEARCH samples
+    all_metadata.loc[all_metadata['collected_by'].str.contains('SEARCH', na=False), 'amplicon_PCR_primer_scheme'] = all_metadata['amplicon_PCR_primer_scheme'].fillna('snap_primers')
+
     # Create human-readable, unique site_id for each sample
     all_metadata['collection_site_id'] = all_metadata['geo_loc_name'].fillna('') +\
         all_metadata['ww_population'].fillna('').astype(str) +\
@@ -316,7 +319,7 @@ def main():
 
     all_metadata['collection_site_id'] = all_metadata['collection_site_id'].apply(md5_hash)
     all_metadata['collection_site_id'] = all_metadata['geo_loc_country'] + '_' + all_metadata['geo_loc_region'].apply(
-        lambda x: us_state_to_abbrev[x] if x in us_state_to_abbrev else x) + '_' + all_metadata['collection_site_id']
+        lambda x: US_STATE_TO_ABBREV[x] if x in US_STATE_TO_ABBREV else x) + '_' + all_metadata['collection_site_id']
 
     # Select samples to run
     all_metadata['sample_status'] = all_metadata['sample_status'].fillna('to_run')

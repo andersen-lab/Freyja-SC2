@@ -6,11 +6,11 @@ process FREYJA_VARIANTS {
     path reference
 
     output:
-    tuple val(meta), path("${meta.id}.variants.tsv"), path("${meta.id}.depths.tsv")
+    tuple val(meta), path("${meta.id}_variants.tsv"), path("${meta.id}_depths.tsv")
 
     script:
     """
-    freyja variants ${bam} --variants ${meta.id}.variants.tsv --depths ${meta.id}.depths.tsv --ref ${reference}
+    freyja variants ${bam} --variants ${meta.id}_variants.tsv --depths ${meta.id}_depths.tsv --ref ${reference}
     """
 }
 
@@ -23,7 +23,7 @@ process FREYJA_DEMIX {
     path barcodes
 
     output:
-    path "*.demix.tsv"
+    path "*.demixed"
 
     script:
     """
@@ -31,6 +31,7 @@ process FREYJA_DEMIX {
         $variants \\
         $depths \\
         --barcodes $barcodes \\
-        --output ${meta.id}.demix.tsv
+        --output ${meta.id}.demixed \\
+        --autoadapt
     """
 }
