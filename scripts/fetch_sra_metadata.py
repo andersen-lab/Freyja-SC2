@@ -248,8 +248,8 @@ def main():
     # Parse location information
     ## Combine ENA country column with SRA country column
     def _col(df, name):
-        """Return df[name] if it exists, else None (so fillna is a no-op)."""
-        return df[name] if name in df.columns else None
+        """Return df[name] if it exists, else a NA Series (so fillna is a no-op)."""
+        return df[name] if name in df.columns else pd.Series(pd.NA, index=df.index, dtype=object)
 
     all_metadata['geo_loc_name'] = all_metadata['geo_loc_name'].fillna(
         _col(all_metadata, 'geographic_location_(country_and/or_sea)'))
