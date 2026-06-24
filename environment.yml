@@ -9,7 +9,7 @@ dependencies:
   - bioconda::sra-tools
   - conda-forge::pigz=2.8  
   - conda-forge::python=3.11
-  - conda-forge::pyarrow
+  - conda-forge::pyarrow>=13
   - pip
   - pip:
     - epiweeks
