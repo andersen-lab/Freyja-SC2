@@ -43,7 +43,8 @@ metadata['census_region'] = metadata['geo_loc_region'].map(STATE_TO_REGION)
 metadata['Geographic_Location'] = metadata['geo_loc_country'] + '/' + metadata['geo_loc_region']
 metadata = metadata[metadata['Geographic_Location'].notna()]
 
-metadata['epiweek'] = metadata['collection_date'].apply(lambda x: Week.fromdate(x))
+metadata['collection_date'] = pd.to_datetime(metadata['collection_date'], errors='coerce').dt.date
+metadata['epiweek'] = metadata['collection_date'].apply(lambda x: Week.fromdate(x) if pd.notna(x) else pd.NA)
 
 # Remove illegal characters 
 metadata['collected_by'] = metadata.collected_by.str.replace(';', ' ').replace('/', ' ').replace(',', ' ')
