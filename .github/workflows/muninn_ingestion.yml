@@ -17,7 +17,7 @@ on:
           - artifact
           - bucket
       test_mode:
-        description: 'Fetch only the first 100 accessions from data/all_metadata.tsv instead of the full bucket (bucket mode only)'
+        description: 'Fetch only the first 10 accessions from data/all_metadata.tsv instead of the full bucket (bucket mode only)'
         type: boolean
         default: false
 
@@ -87,8 +87,8 @@ jobs:
         run: |
           mkdir -p outputs/variants outputs/demix
           if [[ "${{ inputs.test_mode }}" == "true" ]]; then
-            # Test mode: fetch only the first 100 accessions from data/all_metadata.tsv
-            ACCS=$(tail -n +2 data/all_metadata.tsv | head -n 100 | cut -f1)
+            # Test mode: fetch only the first 10 accessions from data/all_metadata.tsv
+            ACCS=$(tail -n +2 data/all_metadata.tsv | head -n 10 | cut -f1)
             for ACC in $ACCS; do
               gcloud storage cp "gs://outbreak-ww-data/variants/${ACC}_variants.tsv" outputs/variants/ --billing-project=andersen-lab-primary 2>/dev/null || true
               gcloud storage cp "gs://outbreak-ww-data/variants/${ACC}_depths.tsv" outputs/variants/ --billing-project=andersen-lab-primary 2>/dev/null || true
