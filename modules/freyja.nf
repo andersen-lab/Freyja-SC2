@@ -11,6 +11,7 @@ process FREYJA_VARIANTS {
     script:
     """
     freyja variants ${bam} --variants ${meta.id}_variants.tsv --depths ${meta.id}_depths.tsv --ref ${reference}
+    samtools mpileup -aa -A -d 600000 -Q 0 -q 0 -B -f ${reference} ${bam} | cut -f1-4 > ${meta.id}_depths.tsv
     """
 }
 
