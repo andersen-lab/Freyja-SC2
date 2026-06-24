@@ -12,7 +12,7 @@ dependencies:
   - pip
   - pip:
     - epiweeks
-    - pandas
+    - pandas>=2,<3
     - pyarrow>=13
     - frozendict
     - git+https://github.com/outbreak-info/python-outbreak-info
