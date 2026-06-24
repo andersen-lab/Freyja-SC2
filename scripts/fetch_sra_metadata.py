@@ -76,7 +76,7 @@ US_STATE_TO_ABBREV = {
     "U.S. Virgin Islands": "VI",
 }
 
-START_DATE = '2020-03-01'
+START_DATE = '2026-05-01'
 END_DATE = datetime.now().strftime('%Y-%m-%d')
 INTERVAL = 14 # days
 
@@ -86,7 +86,12 @@ def md5_hash(string):
 
 
 def parse_collection_date(x):
-    # If collection_date is in the format '20XX-XX-XX/20XX-XX-XX', take the second date
+    # Guard against non-string values (e.g. NaN/float) before regex operations
+    if pd.isna(x):
+        return x
+    x = str(x)
+
+    # If collection_date is a date range '20XX-XX-XX/20XX-XX-XX', take the first date
     if re.match(r'\d{4}-\d{2}-\d{2}/\d{4}-\d{2}-\d{2}', x):
         return x.split('/')[0]
 
