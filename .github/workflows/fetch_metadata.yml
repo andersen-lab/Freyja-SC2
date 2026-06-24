@@ -35,10 +35,10 @@ jobs:
           path: |
             ${{ env.NXF_WORK }}/conda
             $CONDA_PREFIX/envs
-          key: env-${{ env.NXF_VER }}-${{ github.job }}
+          key: env-${{ env.NXF_VER }}-${{ github.job }}-${{ hashFiles('environment.yml') }}
           restore-keys: |
-            env-${{ env.NXF_VER }}-${{ github.job }}
-            env-${{ env.NXF_VER }}
+            env-${{ env.NXF_VER }}-${{ github.job }}-
+            env-${{ env.NXF_VER }}-
             env-
       - name: "Check and setup conda environment"
         run: |
