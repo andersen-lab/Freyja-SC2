@@ -8,10 +8,10 @@ dependencies:
   - bioconda::minimap2
   - bioconda::sra-tools
   - conda-forge::pigz=2.8  
-  - conda-forge::pyarrow>=13
   - pip
   - pip:
     - epiweeks
     - pandas
+    - pyarrow>=13
     - frozendict
     - git+https://github.com/outbreak-info/python-outbreak-info
