@@ -50,8 +50,10 @@ jobs:
             env-
 
       - name: 'Check and setup conda environment'
-        run: | 
-          mamba env update --name freyja-sc2 --file environment.yml --prune
+        if: steps.cache-envs.outputs.cache-hit != 'true'
+        run: |
+          conda env remove -n freyja-sc2 --yes 2>/dev/null || true
+          mamba env create -n freyja-sc2 -f environment.yml
 
       - id: 'auth'
         name: 'Authenticate with gcloud'

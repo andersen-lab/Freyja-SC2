@@ -41,8 +41,10 @@ jobs:
             env-${{ env.NXF_VER }}-
             env-
       - name: "Check and setup conda environment"
+        if: steps.cache-envs.outputs.cache-hit != 'true'
         run: |
-          mamba env update --name freyja-sc2 --file environment.yml --prune
+          conda env remove -n freyja-sc2 --yes 2>/dev/null || true
+          mamba env create -n freyja-sc2 -f environment.yml
       - name: Fetch NCBI metadata
         run: |
           mamba activate freyja-sc2
