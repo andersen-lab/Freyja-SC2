@@ -8,13 +8,13 @@ original_sample_status = metadata['sample_status']
 metadata['sample_status'] = 'to_run'
 
 for file in os.listdir('outputs/variants'):
-    if file.endswith('variants.tsv'):
-        sample_id = file.split('.')[0]
+    if file.endswith('_variants.tsv'):
+        sample_id = file[:-len('_variants.tsv')]
         metadata.loc[metadata['accession'] == sample_id, 'sample_status'] = 'demix_error'
 
 for file in os.listdir('outputs/demix'):
-    if file.endswith('demixed'):
-        sample_id = file.split('.')[0]
+    if file.endswith('.demixed'):
+        sample_id = file[:-len('.demixed')]
         metadata.loc[metadata['accession'] == sample_id, 'sample_status'] = 'completed'
 
 # If the original sample status was 'fastq_error', set the new sample status to 'fastq_error'

@@ -6,13 +6,19 @@ import os
 
 import pandas as pd
 
+def accession_from_variants_filename(path):
+    base = os.path.basename(path)
+    if base.endswith('_variants.tsv'):
+        return base[:-len('_variants.tsv')]
+    return base.split('_')[0]
+
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '-i', '--input-dir',
         required=True,
-        help='Directory containing *.variants.tsv and *.depths.tsv',
+        help='Directory containing *_variants.tsv and *_depths.tsv',
     )
     parser.add_argument(
         '-o', '--output-dir',
@@ -40,7 +46,7 @@ def main():
             continue
 
         if not df.empty:
-            df['SRA'] = os.path.basename(var_path).split('.')[0]
+            df['SRA'] = accession_from_variants_filename(var_path)
             variants_list.append(df.copy())
 
     if variants_list:

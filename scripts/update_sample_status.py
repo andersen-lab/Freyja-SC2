@@ -16,13 +16,13 @@ for accession in accessions_processed:
     if f'{accession}_variants.tsv' not in variants:
         metadata.loc[metadata['accession'] == accession, 'sample_status'] = 'fastq_error'
 for file in demix:
-    if file.endswith('demixed'):
-        sample_id = file.split('.')[0]
+    if file.endswith('.demixed'):
+        sample_id = file[:-len('.demixed')]
         metadata.loc[metadata['accession'] == sample_id, 'sample_status'] = 'completed'
 
 for file in variants:
-    if file.endswith('variants.tsv'):
-        sample_id = file.split('.')[0]
+    if file.endswith('_variants.tsv'):
+        sample_id = file[:-len('_variants.tsv')]
         if f'{sample_id}.demixed' not in demix:
             metadata.loc[metadata['accession'] == sample_id, 'sample_status'] = 'demix_error'
         
