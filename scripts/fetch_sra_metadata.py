@@ -247,17 +247,22 @@ def main():
 
     # Parse location information
     ## Combine ENA country column with SRA country column
-    
-    all_metadata['geo_loc_name'] = all_metadata['geo_loc_name'].fillna(all_metadata['geographic_location_(country_and/or_sea)'])
+    def _col(df, name):
+        """Return df[name] if it exists, else None (so fillna is a no-op)."""
+        return df[name] if name in df.columns else None
+
+    all_metadata['geo_loc_name'] = all_metadata['geo_loc_name'].fillna(
+        _col(all_metadata, 'geographic_location_(country_and/or_sea)'))
     all_metadata = all_metadata[~all_metadata['geo_loc_name'].isna()]
 
     all_metadata['geo_loc_country'] = all_metadata['geo_loc_name'].apply(
-    lambda x: x.split(':')[0].strip() if ':' in x else x)
+        lambda x: x.split(':')[0].strip() if ':' in x else x)
     all_metadata['geo_loc_region'] = all_metadata['geo_loc_name'].apply(
         lambda x: x.split(':')[1].strip() if len(x.split(':')) > 1 else '')
     all_metadata['geo_loc_region'] = all_metadata['geo_loc_region'].apply(
         lambda x: x.split(',')[0].strip() if len(x.split(',')) > 1 else x)
-    all_metadata['geo_loc_region'] = all_metadata['geo_loc_region'].fillna(all_metadata['geographic_location_(region_and_locality)'])
+    all_metadata['geo_loc_region'] = all_metadata['geo_loc_region'].fillna(
+        _col(all_metadata, 'geographic_location_(region_and_locality)'))
    
     if 'US Virgin Islands' in all_metadata['geo_loc_region'].unique():
         all_metadata['geo_loc_region'] = all_metadata['geo_loc_region'].replace(
@@ -267,7 +272,7 @@ def main():
 
     # Parse population size
     all_metadata['ww_population'] = all_metadata['ww_population'].fillna(
-        all_metadata['population_size_of_the_catchment_area']) # for ENA
+        _col(all_metadata, 'population_size_of_the_catchment_area'))  # for ENA
 
     all_metadata['ww_population'] = pd.to_numeric(all_metadata['ww_population'], errors='coerce')
     all_metadata = all_metadata[~all_metadata['ww_population'].isna()]
