@@ -24,13 +24,13 @@ jobs:
     runs-on: [self-hosted, profchaos]
     steps:
       - name: Checkout main
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           ref: main
       - name: Cache envs
         id: cache-envs
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ${{ env.NXF_WORK }}/conda
