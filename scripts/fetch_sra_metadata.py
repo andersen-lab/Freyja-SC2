@@ -76,7 +76,7 @@ US_STATE_TO_ABBREV = {
     "U.S. Virgin Islands": "VI",
 }
 
-START_DATE = '2026-05-01'
+START_DATE = '2025-01-01'
 END_DATE = datetime.now().strftime('%Y-%m-%d')
 INTERVAL = 14 # days
 
