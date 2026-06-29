@@ -28,5 +28,6 @@ jobs:
 
   muninn_ingest:
     needs: process_samples
+    if: needs.process_samples.outputs.new_samples == 'true'
     uses: ./.github/workflows/muninn_ingestion.yml
     secrets: inherit

@@ -2,6 +2,10 @@ name: Process Samples
 
 on:
   workflow_call:
+    outputs:
+      new_samples:
+        description: 'true if new samples were processed this run'
+        value: ${{ jobs.run.outputs.new_samples }}
   workflow_dispatch:
 
 concurrency:
@@ -28,6 +32,8 @@ jobs:
     permissions:
       contents: write
       id-token: write
+    outputs:
+      new_samples: ${{ steps.check_samples.outputs.new_samples }}
 
     steps:
       - name: Checkout main
@@ -69,6 +75,15 @@ jobs:
                   --num_samples $BATCH_SIZE \
                   -profile local \
                   -entry fetch
+
+      - name: 'Check for new samples'
+        id: check_samples
+        run: |
+          if [ -f data/accession_list.txt ]; then
+            echo "new_samples=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "new_samples=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: 'Update processed samples'
         if: ${{ hashFiles('data/accession_list.txt') != '' }}
