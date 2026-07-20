@@ -10,7 +10,12 @@ process CUTADAPT_TRIM {
     tuple val(meta), path("*_trimmed.fastq")
 
     script:
-    if (reads.size() == 2) {
+    if (reads.size() == 3) { // unpaired.fastq, read_1.fastq, read_2.fastq
+        """
+        cutadapt -l +30 -l -30 -o ${meta.id}_0_trimmed.fastq ${reads[0]}
+        cutadapt -l +30 -l -30 -o ${meta.id}_1_trimmed.fastq -p ${meta.id}_2_trimmed.fastq ${reads[1]} ${reads[2]}
+        """
+    } else if (reads.size() == 2) {
         """
         cutadapt -l +30 -l -30 -o ${meta.id}_1_trimmed.fastq -p ${meta.id}_2_trimmed.fastq ${reads[0]} ${reads[1]}
         """
