@@ -5,7 +5,7 @@ runs:
   steps:
     - name: Cache envs
       id: cache-envs
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: |
           ${{ env.NXF_WORK }}/conda
