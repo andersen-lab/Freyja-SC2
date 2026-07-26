@@ -1,0 +1,19 @@
+version: 2
+updates:
+  # Keep GitHub Actions used by the workflows and the composite action up to date.
+  - package-ecosystem: "github-actions"
+    directories:
+      - "/"
+      - "/.github/actions/*"
+    schedule:
+      interval: "monthly"
+      day: "monday"
+    commit-message:
+      prefix: "ci"
+    open-pull-requests-limit: 5
+    groups:
+      # Batch low-risk bumps into a single PR; major bumps get their own PR.
+      actions-minor:
+        update-types:
+          - "minor"
+          - "patch"
