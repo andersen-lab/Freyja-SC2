@@ -77,7 +77,7 @@ jobs:
 
       - name: 'Download new run outputs'
         if: ${{ inputs.ingest_source == 'artifact' }}
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: run-outputs
           path: outputs
