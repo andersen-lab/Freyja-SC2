@@ -24,7 +24,7 @@ jobs:
     runs-on: [self-hosted, profchaos]
     steps:
       - name: Checkout main
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           ref: main
