@@ -30,7 +30,7 @@ jobs:
           ref: main
       - name: Cache envs
         id: cache-envs
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: |
             ${{ env.NXF_WORK }}/conda
