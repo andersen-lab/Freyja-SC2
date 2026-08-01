@@ -16,7 +16,7 @@ runs:
           env-${{ env.NXF_VER }}
           env-
     - name: Setup for conda
-      uses: conda-incubator/setup-miniconda@v3
+      uses: conda-incubator/setup-miniconda@v4
       with:
         environment-file: environment.yml
         python-version: 3.11
