@@ -4,7 +4,7 @@ on:
   workflow_call:
     outputs:
       new_samples:
-        description: 'true if new samples were processed this run'
+        description: 'true if new samples were processed and produced demix output to ingest'
         value: ${{ jobs.run.outputs.new_samples }}
   workflow_dispatch:
 
@@ -67,7 +67,7 @@ jobs:
         with:
           workload_identity_provider: 'projects/12767718289/locations/global/workloadIdentityPools/github-actions/providers/freyja-sc2'
           service_account: 'outbreak-ww@andersen-lab-primary.iam.gserviceaccount.com'
-          
+
       - name: Run pipeline on new samples
         run: |
                 mamba activate freyja-sc2
@@ -79,11 +79,19 @@ jobs:
       - name: 'Check for new samples'
         id: check_samples
         run: |
-          if [ -f data/accession_list.txt ]; then
-            echo "new_samples=true" >> "$GITHUB_OUTPUT"
-          else
+          if [ ! -f data/accession_list.txt ]; then
+            echo "No new samples were fetched this run."
             echo "new_samples=false" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
+          if [ -z "$(find outputs/demix -name '*.demixed' -type f -print -quit 2>/dev/null)" ]; then
+            echo "::warning::outputs/demix is empty - no demix results this run; skipping muninn ingestion."
+            echo "> [!WARNING]" >> "$GITHUB_STEP_SUMMARY"
+            echo "> No demix output was produced this run. The batch was recorded as demix_error and nothing was ingested into muninn." >> "$GITHUB_STEP_SUMMARY"
+            echo "new_samples=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "new_samples=true" >> "$GITHUB_OUTPUT"
 
       - name: 'Update processed samples'
         if: ${{ hashFiles('data/accession_list.txt') != '' }}
@@ -102,7 +110,7 @@ jobs:
           project_id: 'andersen-lab-primary'
 
       - name: 'Upload run outputs for muninn ingestion'
-        if: ${{ hashFiles('data/accession_list.txt') != '' }}
+        if: steps.check_samples.outputs.new_samples == 'true'
         uses: actions/upload-artifact@v7
         with:
           name: run-outputs
@@ -111,7 +119,7 @@ jobs:
             outputs/demix
           if-no-files-found: ignore
           retention-days: 1
-      
+
       - name: 'Commit and push changes'
         if: ${{ hashFiles('data/accession_list.txt') != '' }}
         run: |

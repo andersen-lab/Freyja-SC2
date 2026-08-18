@@ -3,8 +3,8 @@ import sys
 import pandas as pd
 
 metadata = pd.read_csv('data/all_metadata.tsv', sep='\t')
-demix = os.listdir('outputs/demix')
-variants = os.listdir('outputs/variants')
+demix = os.listdir('outputs/demix') if os.path.isdir('outputs/demix') else []
+variants = os.listdir('outputs/variants') if os.path.isdir('outputs/variants') else []
 batch_size = int(sys.argv[1])
 
 accessions_processed = []
@@ -25,5 +25,5 @@ for file in variants:
         sample_id = file[:-len('_variants.tsv')]
         if f'{sample_id}.demixed' not in demix:
             metadata.loc[metadata['accession'] == sample_id, 'sample_status'] = 'demix_error'
-        
+
 metadata.to_csv('data/all_metadata.tsv', index=False, sep='\t')
